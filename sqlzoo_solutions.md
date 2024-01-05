@@ -530,3 +530,82 @@ SELECT name, CASE WHEN (dept = 1 OR dept = 2) THEN 'Sci'
              END
 FROM teacher
 ```
+
+## Using NULL
+
+1.
+```sql
+SELECT count(id) FROM stops
+```
+2.
+```sql
+SELECT id FROM stops
+  WHERE name = 'Craiglockhart'
+```
+3.
+```sql
+SELECT id, name
+FROM route LEFT JOIN stops ON (route.stop = stops.id)
+  WHERE num = '4' AND company = 'LRT'
+```
+4.
+```sql
+SELECT company, num, COUNT(*)
+FROM route WHERE stop=149 OR stop=53
+GROUP BY company, num
+HAVING COUNT(*) > 1
+```
+5.
+```sql
+SELECT a.company, a.num, a.stop, b.stop
+FROM route a JOIN route b ON
+  (a.company=b.company AND a.num=b.num)
+WHERE a.stop = '53' AND b.stop = (SELECT id FROM stops
+                  WHERE name = 'London Road')
+
+```
+6.
+```sql
+SELECT a.company, a.num, stopa.name, stopb.name
+FROM route a JOIN route b ON (a.company=b.company AND a.num=b.num)
+             JOIN stops stopa ON (a.stop=stopa.id)
+             JOIN stops stopb ON (b.stop=stopb.id)
+WHERE stopa.name = 'Craiglockhart' AND stopb.name = 'London Road'
+```
+7.
+```sql
+SELECT a.company, a.num
+FROM route a JOIN route b ON (a.company = b.company AND a.num = b.num)
+             JOIN stops stopa ON (a.stop = stopa.id)
+             JOIN stops stopb ON (b.stop = stopb.id)
+  WHERE stopa.id = '115' AND stopb.id = '137'
+GROUP BY a.company, a.num
+```
+8.
+```sql
+SELECT a.company, a.num ## stopa.name, stopb.name
+FROM route a JOIN route b ON (a.num = b.num AND a.company = b.company)
+             JOIN stops stopa ON (a.stop = stopa.id)
+             JOIN stops stopb ON (b.stop = stopb.id)
+  WHERE stopa.name = 'Craiglockhart' AND stopb.name = 'Tollcross'
+```
+9.
+```sql
+SELECT stopb.name, a.company, a.num
+FROM route a JOIN route b ON (a.num = b.num AND a.company = b.company)
+             JOIN stops stopa ON (a.stop = stopa.id)
+             JOIN stops stopb ON (b.stop = stopb.id)
+  WHERE a.company = 'LRT' AND stopa.name = 'Craiglockhart'
+```
+10. This is where you literally add another self joint table to another self joint table, and then match the values in 2nd and 3rd to link
+```sql
+SELECT a.num, a.company, stopb.name, c.num, c.company
+FROM route a JOIN route b ON (a.num = b.num AND a.company = b.company)
+             JOIN ( route c JOIN route d ON (c.num = d.num AND c.company = d.company))
+             JOIN stops stopa ON (a.stop = stopa.id)
+             JOIN stops stopb ON (b.stop = stopb.id)
+             JOIN stops stopc ON (c.stop = stopc.id)
+             JOIN stops stopd ON (d.stop = stopd.id)
+  WHERE stopa.name = 'Craiglockhart' AND stopd.name = 'Lochend' AND stopb.name = stopc.name
+ORDER BY 1, 2, 3, 4, 5
+```
