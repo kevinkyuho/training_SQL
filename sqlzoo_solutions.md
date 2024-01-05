@@ -470,3 +470,10 @@ FROM casting JOIN actor ON (casting.actorid = actor.id)
                      WHERE actorid = (SELECT id FROM actor WHERE name = 'Art Garfunkel')
                     ) AND name <> 'Art Garfunkel'
 ```
+
+## Using NULL
+
+1.
+```sql
+TBD
+```
