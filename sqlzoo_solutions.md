@@ -11,6 +11,7 @@ I've compiled the solutions to all of all 10 levels on the [SQLZOO Tutoral](http
 7. [More JOIN](#more-join)
 8. [Using NULL](#using-null)
 9. [Self JOIN](#self-join)
+10. [Exercises](#exercises)
 
 ## SELECT basics
 
@@ -531,7 +532,7 @@ SELECT name, CASE WHEN (dept = 1 OR dept = 2) THEN 'Sci'
 FROM teacher
 ```
 
-## Using NULL
+## SELF JOIN
 
 1.
 ```sql
@@ -608,4 +609,67 @@ FROM route a JOIN route b ON (a.num = b.num AND a.company = b.company)
              JOIN stops stopd ON (d.stop = stopd.id)
   WHERE stopa.name = 'Craiglockhart' AND stopd.name = 'Lochend' AND stopb.name = stopc.name
 ORDER BY 1, 2, 3, 4, 5
+```
+
+## Exercises
+
+NSS Tutorial
+
+1.
+```sql
+SELECT A_STRONGLY_AGREE
+FROM nss
+  WHERE question = 'Q01' AND institution = 'Edinburgh Napier University' AND subject LIKE '%(8)%'
+```
+2.
+```sql
+SELECT institution, subject
+FROM nss
+  WHERE score >= 100 AND question LIKE '%15%'
+```
+3.
+```sql
+SELECT institution, score
+FROM nss
+  WHERE subject LIKE '%(8)%' AND question LIKE '%Q15%' AND score < 50;
+```
+4.
+```sql
+SELECT subject, SUM(response)
+FROM nss
+  WHERE question LIKE '%22%'
+GROUP BY subject
+HAVING subject LIKE '%(8)%' OR subject LIKE '%(H)%';
+```
+5.
+```sql
+SELECT subject, SUM(A_STRONGLY_AGREE*response/100)
+FROM nss
+  WHERE question = 'Q22'
+GROUP BY subject
+HAVING subject LIKE '%(8)%' OR subject LIKE '%(H)%';
+```
+6.
+```sql
+SELECT subject, ROUND(SUM(response*A_STRONGLY_AGREE/100)/SUM(response)*100,0)
+FROM nss
+  WHERE question = 'Q22'
+GROUP BY 1
+HAVING subject LIKE '%(8)%' OR subject LIKE '%(H)%';
+```
+7.
+```sql
+SELECT institution, ROUND(SUM(score*response/100)/SUM(response)*100,0)
+FROM nss
+  WHERE question = 'Q22' AND institution LIKE '%manchester%'
+GROUP BY institution;
+```
+8.
+```sql
+SELECT institution, SUM(sample), SUM(CASE WHEN subject LIKE '%(8)%' THEN sample
+                                     ELSE null
+                                     END)
+FROM nss
+  WHERE institution LIKE '%manchester%' AND question = 'Q01'
+GROUP BY 1;
 ```
